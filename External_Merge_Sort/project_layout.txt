@@ -1,0 +1,45 @@
+read user input (command prompt parameters)
+
+generate n records of m size
+
+store records to input.txt
+
+sort data
+    build cache-size runs
+        while (unprocessed input data)
+            while (i < cache / 8 Bytes)    // 8 Byte keys, when i*8 = cache size -> cache-sized run
+                add key to run
+            sort run                       // sort keys using tournament tree
+            if (DRAM not full)
+                store run to DRAM          // run = sorted collection of n=(cache size/8) keys
+            else if (SSD not full)
+                store run to SSD
+            else 
+                store run to HDD
+    
+    merge runs into X-sized buckets  // re-use tournament tree to fan in, tree has to fit in memory
+        if (X > Memory)                             // X determined by total records and memory size
+            merge runs into M-sized buckets         // recurse with larger and larger buckets
+            place buckets in DRAM                   // until buckets are of sufficient size for final merge
+        if (X > DRAM)
+            merge M-sized buckets into DRAM-sized buckets
+            place buckets in SSD
+        if (X > SSD)
+            merge DRAM-sized buckets into SSD-sized buckets
+            place buckets in HDD
+    
+    final merge -> fan in X-sized buckets
+        remove duplicates
+        store sorted keys to appropriate location (SSD if too many for DRAM, etc.)
+
+store sorted data to output.txt
+    sort::next returns next sorted key
+    copy first record with that key from input.txt to output.txt (only moving full record once)
+
+
+Merge Tree size
+    N nodes where (key size * N nodes) fits in memory
+    L leaf nodes where L*2 = number of X-sized buckets (each leaf is fed by two buckets)
+
+Cache sort tree size
+    L leaf nodes where L = (cache size)/(2 * key size)
