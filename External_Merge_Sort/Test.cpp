@@ -30,7 +30,7 @@ int main (int argc, char * argv [])
 		std::cout << "Error: having issue generating input. Please investigate.";
 		return 0;
 	};
-    #pragma endregion filePrep
+   	#pragma endregion filePrep
 
 
 	TRACE (true);
@@ -88,7 +88,7 @@ bool generateInput(int numberOfRecords, int recordSize){
 		generatedInput << temp;
 		generatedInput <<std::endl;
 	}
-    generatedInput.close();	
+    	generatedInput.close();	
 	createdOutputFile.close();
 	createdOutputTraceFile.close();
 	return true;
