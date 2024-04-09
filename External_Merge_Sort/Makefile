@@ -11,13 +11,13 @@ SCRS=
 
 # headers and code sources
 HDRS=	defs.h \
-		Iterator.h Scan.h Filter.h Sort.h
+		Iterator.h Scan.h Filter.h Sort.h Verification.h
 SRCS=	defs.cpp Assert.cpp Test.cpp \
-		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp
+		Iterator.cpp Scan.cpp Filter.cpp Sort.cpp Verification.cpp
 
 # compilation targets
 OBJS=	defs.o Assert.o Test.o \
-		Iterator.o Scan.o Filter.o Sort.o
+		Iterator.o Scan.o Filter.o Sort.o Verification.o
 
 # RCS assists
 REV=-q -f
@@ -53,3 +53,4 @@ co :
 
 clean :
 	@rm -f $(OBJS) Test.exe Test.exe.stackdump trace
+
