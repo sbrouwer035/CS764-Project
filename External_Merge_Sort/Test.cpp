@@ -3,16 +3,23 @@
 #include <ctime>
 #include <unistd.h>
 #include <cstdlib>
+#include "Constant.h"
 #include "Iterator.h"
 #include "Scan.h"
 #include "Filter.h"
 #include "Sort.h"
 #include "verification.h"
 
+
 bool generateInput(int numberOfRecords, int recordSize);
 
 int main (int argc, char * argv [])
 {	
+	std::cout << CACHE_SIZE << "\n";
+	std::cout << DRAM_SIZE << "\n";
+	std::cout << SSD_SIZE << "\n";
+	std::cout << SSD_Bandwidth << "\n";
+
 	//--------------------------Generate input file input_table, create output files output_table and trace0.txt
 	#pragma region filePrep
 	int numberOfRecords;
@@ -30,7 +37,7 @@ int main (int argc, char * argv [])
 		std::cout << "Error: having issue generating input. Please investigate.";
 		return 0;
 	};
-   	#pragma endregion filePrep
+    #pragma endregion filePrep
 
 
 	TRACE (true);
@@ -48,6 +55,7 @@ int main (int argc, char * argv [])
 	#pragma region validation
 	verifyDataIntegrity();
 	verifySortOrder();
+
 	#pragma endregion validation
 
 	return 0;
@@ -88,7 +96,7 @@ bool generateInput(int numberOfRecords, int recordSize){
 		generatedInput << temp;
 		generatedInput <<std::endl;
 	}
-    	generatedInput.close();	
+    generatedInput.close();	
 	createdOutputFile.close();
 	createdOutputTraceFile.close();
 	return true;
