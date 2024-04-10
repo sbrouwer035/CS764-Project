@@ -1,3 +1,4 @@
+#include <string>
 #include "Iterator.h"
 
 class SortPlan : public Plan
@@ -22,3 +23,41 @@ private:
 	Iterator * const _input;
 	RowCount _consumed, _produced;
 }; // class SortIterator
+
+class Run
+{
+public:
+	Run();
+	std::string nextValue();
+private:
+	int recordCount;
+	int index;
+};
+
+class TreeNode
+{
+public:
+	TreeNode(Run runList[], int runCount, int depth, int * runsAssigned);
+	std::string getNextVal();
+
+private:
+	std::string leftVal;
+	std::string rightVal;
+	TreeNode * leftChild;
+	TreeNode * rightChild;
+	bool isLeaf;
+	Run * leftSource;
+	Run * rightSource;
+
+	void setLeftVal();
+	void setRightVal();
+	std::string getNextInput(Run * source);
+};
+
+class SortTree
+{
+public:
+	SortTree(Run runList[], int runCount);
+private:
+	TreeNode * root;
+};
