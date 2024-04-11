@@ -1,5 +1,6 @@
 #include <string>
 #include "Iterator.h"
+#include "Run.h"
 
 class SortPlan : public Plan
 {
@@ -24,20 +25,10 @@ private:
 	RowCount _consumed, _produced;
 }; // class SortIterator
 
-class Run
-{
-public:
-	Run();
-	std::string nextValue();
-private:
-	int recordCount;
-	int index;
-};
-
 class TreeNode
 {
 public:
-	TreeNode(Run runList[], int runCount, int depth, int * runsAssigned);
+	TreeNode(Run * runList[], int runCount, int depth, int * runsAssigned);
 	std::string getNextVal();
 
 private:
@@ -57,7 +48,8 @@ private:
 class SortTree
 {
 public:
-	SortTree(Run runList[], int runCount);
+	SortTree(Run * runList[], int runCount);
+	std::string nextValue();
 private:
 	TreeNode * root;
 };

@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <string>
 /*real stats
 const uint64_t CACHE_SIZE = 1 << 20;              //1MB Cache
 const uint64_t DRAM_SIZE = 100 << 20;             //100MB DRAM
@@ -21,5 +22,6 @@ const int SSD_Bandwidth = 210;                    //200 MB/s => 210 byte/us
 const int HDD_Bandwidth = 105;                    //100 MB/s => 105 byte/us
 const int SSD_LATENCY = 100;                      //100 micro second
 const int HDD_LATENCY = 5000;                     //5000 micro second
+const std::string MAX_VALUE = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 
 #endif

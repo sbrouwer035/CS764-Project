@@ -1,4 +1,6 @@
+#include <iostream>
 #include "Sort.h"
+#include "Constant.h"
 
 SortPlan::SortPlan (Plan * const input) : _input (input)
 {
@@ -49,7 +51,7 @@ bool SortIterator::next ()
 	return true;
 } // SortIterator::next
 
-SortTree::SortTree (Run runList[], int runCount)
+SortTree::SortTree (Run * runList[], int runCount)
 {
 	//need tree with runCount/2 leaf nodes	
 	int runsAssigned = 0;
@@ -57,8 +59,15 @@ SortTree::SortTree (Run runList[], int runCount)
 
 }
 
-TreeNode::TreeNode(Run runList[], int runCount, int depth, int * runsAssignedPtr)
+std::string SortTree::nextValue()
 {
+	root->getNextVal();
+}
+
+TreeNode::TreeNode(Run * runList[], int runCount, int depth, int * runsAssignedPtr)
+{
+	std::cout << "New node at depth: " << depth << "\n";
+
 	// initialize values to null, they are retrieved during comparisons
 	leftVal = "";
 	rightVal = "";
@@ -67,11 +76,11 @@ TreeNode::TreeNode(Run runList[], int runCount, int depth, int * runsAssignedPtr
 	if ((1 << depth) >= (runCount/2)) {					// 1 << depth == 2^depth
 		isLeaf = true;
 		if (*runsAssignedPtr <= runCount) {
-			leftSource = &runList[*runsAssignedPtr];
+			leftSource = runList[*runsAssignedPtr];
 			(*runsAssignedPtr)++;
 		}
 		if (*runsAssignedPtr <= runCount) {
-			rightSource = &runList[*runsAssignedPtr];
+			rightSource = runList[*runsAssignedPtr];
 			(*runsAssignedPtr)++;
 		}
 		return;
@@ -84,6 +93,7 @@ TreeNode::TreeNode(Run runList[], int runCount, int depth, int * runsAssignedPtr
 
 std::string TreeNode::getNextVal()
 {
+	std::cout << "TreeNode::setNextVal\n";
 	std::string lowestValue;
 
 	// bring up contenders
@@ -107,6 +117,7 @@ std::string TreeNode::getNextVal()
 }
 
 void TreeNode::setLeftVal() {
+	std::cout << "TreeNode::setLeftVal\n";
 	if (isLeaf) {
 		leftVal = getNextInput(leftSource);
 	}
@@ -116,6 +127,7 @@ void TreeNode::setLeftVal() {
 }
 
 void TreeNode::setRightVal() {
+	std::cout << "TreeNode::setRightVal\n";
 	if (isLeaf) {
 		rightVal = getNextInput(rightSource);
 	}
@@ -125,18 +137,9 @@ void TreeNode::setRightVal() {
 }
 
 std::string TreeNode::getNextInput(Run * source) {
+	std::cout << "TreeNode::getNextInput\n";
 	if (source == nullptr) {
-		return "The max string value";
+		return MAX_VALUE;
 	}
 	return source->nextValue();
-}
-
-Run::Run ()
-{
-
-}
-
-std::string Run::nextValue ()
-{
-	return "next value from set of keys in run";
 }
