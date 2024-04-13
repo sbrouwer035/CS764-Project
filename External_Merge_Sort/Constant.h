@@ -22,6 +22,6 @@ const int SSD_Bandwidth = 210;                    //200 MB/s => 210 byte/us
 const int HDD_Bandwidth = 105;                    //100 MB/s => 105 byte/us
 const int SSD_LATENCY = 100;                      //100 micro second
 const int HDD_LATENCY = 5000;                     //5000 micro second
-const std::string MAX_VALUE = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+const std::string MAX_VALUE = "zzzzzzzzzzzzzzzzzzzzzzzzzzz";
 
 #endif

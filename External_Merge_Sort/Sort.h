@@ -28,8 +28,8 @@ private:
 class TreeNode
 {
 public:
-	TreeNode(Run * runList[], int runCount, int depth, int * runsAssigned);
-	std::string getNextVal();
+	TreeNode(std::vector<Run*> &runList, int runCount, int depth, int * runsAssigned);
+	std::string getNextVal(int depth);
 
 private:
 	std::string leftVal;
@@ -40,15 +40,15 @@ private:
 	Run * leftSource;
 	Run * rightSource;
 
-	void setLeftVal();
-	void setRightVal();
+	void setLeftVal(int depth);
+	void setRightVal(int depth);
 	std::string getNextInput(Run * source);
 };
 
 class SortTree
 {
 public:
-	SortTree(Run * runList[], int runCount);
+	SortTree(std::vector<Run*> &runList, int runCount);
 	std::string nextValue();
 private:
 	TreeNode * root;

@@ -9,7 +9,6 @@ Run::Run () {
 }
 
 std::string Run::nextValue() {
-    std::cout << "Run::nextValue(" << index << "," << recordCount << ")";
     if (index < recordCount) {
         std::string value = recordList->at(index);
         index++;

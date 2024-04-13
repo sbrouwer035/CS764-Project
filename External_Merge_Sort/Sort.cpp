@@ -51,7 +51,7 @@ bool SortIterator::next ()
 	return true;
 } // SortIterator::next
 
-SortTree::SortTree (Run * runList[], int runCount)
+SortTree::SortTree (std::vector<Run*> &runList, int runCount)
 {
 	//need tree with runCount/2 leaf nodes	
 	int runsAssigned = 0;
@@ -61,26 +61,24 @@ SortTree::SortTree (Run * runList[], int runCount)
 
 std::string SortTree::nextValue()
 {
-	root->getNextVal();
+	return root->getNextVal(0);
 }
 
-TreeNode::TreeNode(Run * runList[], int runCount, int depth, int * runsAssignedPtr)
+TreeNode::TreeNode(std::vector<Run*> &runList, int runCount, int depth, int * runsAssignedPtr)
 {
-	std::cout << "New node at depth: " << depth << "\n";
-
-	// initialize values to null, they are retrieved during comparisons
 	leftVal = "";
 	rightVal = "";
+	isLeaf = false;
 
 	// leaf nodes point to runs
 	if ((1 << depth) >= (runCount/2)) {					// 1 << depth == 2^depth
 		isLeaf = true;
 		if (*runsAssignedPtr <= runCount) {
-			leftSource = runList[*runsAssignedPtr];
+			leftSource = runList.at(*runsAssignedPtr);
 			(*runsAssignedPtr)++;
 		}
 		if (*runsAssignedPtr <= runCount) {
-			rightSource = runList[*runsAssignedPtr];
+			rightSource = runList.at(*runsAssignedPtr);
 			(*runsAssignedPtr)++;
 		}
 		return;
@@ -91,21 +89,20 @@ TreeNode::TreeNode(Run * runList[], int runCount, int depth, int * runsAssignedP
 	rightChild = new TreeNode(runList, runCount, depth+1, runsAssignedPtr);
 }
 
-std::string TreeNode::getNextVal()
+std::string TreeNode::getNextVal(int depth)
 {
-	std::cout << "TreeNode::setNextVal\n";
 	std::string lowestValue;
 
 	// bring up contenders
 	if (leftVal == "") {
-		setLeftVal();
+		setLeftVal(depth);
 	}
 	if (rightVal == "") {
-		setRightVal();
+		setRightVal(depth);
 	}
 
 	// determine winning contender (lowest value for ascending sort)
-	if (leftVal < rightVal) {
+	if (leftVal.compare(rightVal) <  0) {
 		lowestValue = leftVal;
 		leftVal = "";
 	}
@@ -116,28 +113,25 @@ std::string TreeNode::getNextVal()
 	return lowestValue;
 }
 
-void TreeNode::setLeftVal() {
-	std::cout << "TreeNode::setLeftVal\n";
+void TreeNode::setLeftVal(int depth) {
 	if (isLeaf) {
 		leftVal = getNextInput(leftSource);
 	}
 	else {
-		leftVal = leftChild->getNextVal();
+		leftVal = leftChild->getNextVal(depth+1);
 	}
 }
 
-void TreeNode::setRightVal() {
-	std::cout << "TreeNode::setRightVal\n";
+void TreeNode::setRightVal(int depth) {
 	if (isLeaf) {
 		rightVal = getNextInput(rightSource);
 	}
 	else {
-		rightVal = rightChild->getNextVal();
+		rightVal = rightChild->getNextVal(depth+1);
 	}
 }
 
 std::string TreeNode::getNextInput(Run * source) {
-	std::cout << "TreeNode::getNextInput\n";
 	if (source == nullptr) {
 		return MAX_VALUE;
 	}
