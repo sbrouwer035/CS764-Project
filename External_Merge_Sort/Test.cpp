@@ -40,6 +40,35 @@ int main (int argc, char * argv [])
 	};
     #pragma endregion filePrep
 
+	/*
+	// cache-size runs
+	int recordLimit = recordSize/CACHE_SIZE;
+	std::vector<Run *> * runList = new std::vector<Run *>();
+	int recordsIn=0;
+	std::string value;
+	while (recordsIn < numberOfRecords) {
+
+		// merge single-record "runs" into cache-sized runs
+		if ((recordsIn > 0) & (numberOfRecords%recordLimit == 0)) {
+			
+			// fill run
+			Run * cacheRun = new Run();
+			cacheRun->mergeSubRuns(*runList, recordLimit);
+
+			// store run to memory
+
+
+			// reset runList
+			runList->empty();
+		}
+
+		//value = next value from input_table
+		Run * run = new Run();
+		run->addValue(value);
+		runList->push_back(run);
+		recordsIn++;
+	}
+	*/
 
 	TRACE (true);
 
@@ -124,18 +153,19 @@ void testTree() {
 	runList->push_back(run3);
 	runList->push_back(run1);
 
-	SortTree * mergeTree = new SortTree(*runList, 4);
-	std::string value = mergeTree->nextValue();
+	Run * bigRun = new Run();
+	bigRun->mergeSubRuns(*runList, 4);
+	std::string value = bigRun->nextValue();
 	while (value.compare(MAX_VALUE) < 0) {
-		std::cout << value << std::endl;
-		value = mergeTree->nextValue();
+		std::cout << value << "\n";
+		value = bigRun->nextValue();
 	}
+	
 	delete run1;
 	delete run2;
 	delete run3;
 	delete run4;
 	delete runList;
-	delete mergeTree;
 	return;
 }
 

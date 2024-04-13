@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Run.h"
 #include "Constant.h"
+#include "Sort.h"
 
 Run::Run () {
     recordList = new std::vector<std::string>();
@@ -21,4 +22,14 @@ void Run::addValue (std::string val) {
     recordList->push_back(val);
     recordCount++;
     std::cout << "Added record (" << recordCount << "): " << val << "\n";
+}
+
+void Run::mergeSubRuns(std::vector<Run*> &runList, int runCount) {
+    SortTree * mergeTree = new SortTree(runList, runCount);
+	std::string valToMerge = mergeTree->nextValue();
+	while (valToMerge.compare(MAX_VALUE) < 0) {
+			this->addValue(valToMerge);
+			valToMerge = mergeTree->nextValue();
+	}
+    delete mergeTree;
 }
