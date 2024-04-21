@@ -34,7 +34,7 @@ void NDevice::addRecord(NRecord record)
     
     if (deviceType=="HDD"){
         writeToFile(record);
-        std::cout << record.get_key() << "\n\n";
+        //std::cout << record.get_key() << "\n\n";
         return;
     }
     // remove consective duplicate values
@@ -68,8 +68,8 @@ void NDevice::addRecord(NRecord record)
             cacheTree = new NTournamentTree(get_numberOfBin(), "cache"); // std::cout <<get_numberOfBin()<<"  I am in addRecord and about to start the GD logic\n\n\n";
 
             int counter = 0;
-            cacheTree->buildTree(counter, cacheTree->numberOfBins); cacheTree-> print("",cacheTree->root, false);
-            cacheTree->fillTree(binList, get_numberOfBin());        cacheTree-> print("",cacheTree->root, false);
+            cacheTree->buildTree(counter, cacheTree->numberOfBins); //cacheTree-> print("",cacheTree->root, false);
+            cacheTree->fillTree(binList, get_numberOfBin());        //cacheTree-> print("",cacheTree->root, false);
 
             // std::cout << get_memory_available() << "before \n";
             set_memory_available(get_memory_available() + (unsigned)(cacheTree->spilltoFreeSpace(record.get_size(), binList, *nextLevelDevice))); // std::cout << get_cache_available() << "after \n";
@@ -145,7 +145,7 @@ void NDevice::cleanup_Device()
     
     if (cacheTree == NULL || cacheTree->root ==NULL)
     {
-        std::cout << "device type is : " << deviceType << "CACHE Tree NULL" << (cacheTree==NULL);
+       // std::cout << "device type is : " << deviceType << "CACHE Tree NULL" << (cacheTree==NULL);
         return;
     }
     
@@ -179,7 +179,7 @@ void NDevice::cleanup_Device()
     //std::cout << "\n\n cleanup_Cache print the sidebin"; //<< side_bin.front().get_value() <<"\n\n\n";
 }
 void NDevice::end_Device()
-{   std::cout << "device type is : " << deviceType;
+{   
     cleanup_Device();
     
     if (binList.size() > 0)
@@ -208,7 +208,6 @@ void NDevice::end_Device()
     */
 
 
-    std::cout << "\n\n"
-              << get_numberOfRecord() << "\n\n";    
+    //std::cout << "\n\n"              << get_numberOfRecord() << "\n\n";    
 }
 

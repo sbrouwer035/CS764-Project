@@ -82,10 +82,11 @@ void NTournamentTree::fillTree(std::vector< std::queue<NRecord> >& binList, int 
             leafNodes[i] -> winnerIndex = i;
         }            
     }
-    std::cout << "I am in fillTree: check leafnode key" << leafNodes[0]-> key<<"\n";
+    /*std::cout << "I am in fillTree: check leafnode key" << leafNodes[0]-> key<<"\n";
     if (!binList[0].empty()){
         std::cout << binList[0].front().get_key();
     }
+    */
     mergeTree (root, binList);
 }
 
@@ -171,8 +172,8 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     int freedspace = 0;
     std::string lastPopedKey = "";
     
-    std::cout << "\n\n\n I was here in spillAll " <<nextLevelDevice.deviceType<<"@" << root->winnerKey << "\n";
-    print("",root,false);
+    //std::cout << "\n\n\n I was here in spillAll " <<nextLevelDevice.deviceType<<"@" << root->winnerKey << "\n";
+    //print("",root,false);
     
     
     while (root->winnerKey != maxKey){
@@ -189,7 +190,7 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
         } */
         lastPopedKey = binList[root->winnerIndex].front().get_key();
             //TODO: add record to next layer
-        std::cout << "\n\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << nextLevelDevice.deviceType<< "\n";
+        //std::cout << "\n\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << nextLevelDevice.deviceType<< "\n";
         freedspace += binList[root->winnerIndex].front().get_size();
         NRecord tempRecord (binList[root->winnerIndex].front().get_key(),binList[root->winnerIndex].front().get_value(),binList[root->winnerIndex].front().get_size());
         nextLevelDevice.addRecord(tempRecord);
@@ -206,7 +207,7 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
 
         int tempOffsetValueCode = computeOffSetValueCode(lastSpilledKey, leafNodes[root->winnerIndex]->winnerKey);
         bubbleUp(leafNodes[root->winnerIndex], tempOffsetValueCode, root-> winnerIndex, binList);
-        print("", root, false);
+        //print("", root, false);
         //push new key through tree and get a new winner. 
 
     }
@@ -214,7 +215,7 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     if (lastSpilledKey != lastPopedKey && lastPopedKey != ""){
         lastSpilledKey = lastPopedKey;
     }
-    std::cout << freedspace<< "freed space  \n";
+    //std::cout << freedspace<< "freed space  \n";
     return freedspace;
     
 }
@@ -228,14 +229,14 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
             break;
         }
         lastSpilledKey = root->winnerKey;
-        std::cout << root->winnerKey << "new round ";
+        //std::cout << root->winnerKey << "new round ";
         
         //while (!binList[root->winnerIndex].empty() && binList[root->winnerIndex].front().get_key() < root->key){
         spaceNeeded -= binList[root->winnerIndex].front().get_size();
                     
         lastPopedKey = binList[root->winnerIndex].front().get_key();
             //TODO: add record to next layer
-        std::cout << "\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << "\n";
+        //std::cout << "\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << "\n";
         freedspace += binList[root->winnerIndex].front().get_size();
         
         NRecord tempRecord (binList[root->winnerIndex].front().get_key(),binList[root->winnerIndex].front().get_value(),binList[root->winnerIndex].front().get_size());
@@ -255,7 +256,7 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
 
         int tempOffsetValueCode = computeOffSetValueCode(lastSpilledKey, leafNodes[root->winnerIndex]->winnerKey);
         bubbleUp(leafNodes[root->winnerIndex], tempOffsetValueCode, root-> winnerIndex, binList);
-        print("", root, false);
+        //print("", root, false);
         //push new key through tree and get a new winner. 
 
     }
@@ -263,7 +264,7 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
     if (lastSpilledKey != lastPopedKey){
         lastSpilledKey = lastPopedKey;
     }
-    std::cout << freedspace<< "freed space \n";
+    //std::cout << freedspace<< "freed space \n";
     //print("", root, false);
     return freedspace;
     
@@ -274,12 +275,23 @@ void NTournamentTree::pushBufferBinFirstRecord(std::vector< std::queue<NRecord> 
     leafNodes[0] -> winnerKey = binList[0].front().get_key() ;
     leafNodes[0] -> winnerIndex = 0;
     //int tempOffsetValueCode = computeOffSetValueCode(leafNodes[0] -> parent -> winnerKey, leafNodes[0] ->key);
+
     bufferReplaceBubbleUp(leafNodes[0], 0 , binList);
 }
     
 
 void NTournamentTree::bubbleUp (NTournamentTreeNode * currentNode, int tempOffsetValueCode, int index, std::vector< std::queue<NRecord> >& binList){
-    if (currentNode == root){return;}
+    if (currentNode == root){
+         if (currentNode->key < currentNode-> winnerKey){
+            int tempIndex = currentNode->winnerIndex;
+            std::string tempKey = currentNode->winnerKey;
+            currentNode->winnerIndex = currentNode -> index;
+            currentNode->index = tempIndex;
+            currentNode->winnerKey = currentNode -> key;
+            currentNode->key = tempKey;     
+        }
+        return;
+    }
 
     if (tempOffsetValueCode < currentNode->parent->offsetValueCode){
         currentNode->parent-> winnerIndex = index;
@@ -313,7 +325,19 @@ void NTournamentTree::bubbleUp (NTournamentTreeNode * currentNode, int tempOffse
 
 //When an active tree node is repaced. 
 void NTournamentTree::bufferReplaceBubbleUp (NTournamentTreeNode * currentNode, int index, std::vector< std::queue<NRecord> >& binList){
-    if (currentNode == root){return;}
+   
+    if (currentNode == root){
+        if (currentNode->key < currentNode-> winnerKey){
+            int tempIndex = currentNode->winnerIndex;
+            std::string tempKey = currentNode->winnerKey;
+            currentNode->winnerIndex = currentNode -> index;
+            currentNode->index = tempIndex;
+            currentNode->winnerKey = currentNode -> key;
+            currentNode->key = tempKey;
+            currentNode->offsetValueCode = computeOffSetValueCode(currentNode->winnerKey, currentNode->key);         
+        }
+        return;
+    }
     
 
     //need to redo comparison give up offsetvaluecoding
@@ -322,12 +346,14 @@ void NTournamentTree::bufferReplaceBubbleUp (NTournamentTreeNode * currentNode, 
         currentNode-> parent -> winnerKey = currentNode -> parent -> left -> winnerKey;
         currentNode-> parent -> key = currentNode -> parent -> right -> winnerKey;
         currentNode ->parent -> index = currentNode ->parent -> right -> winnerIndex;
+        currentNode ->parent -> offsetValueCode = computeOffSetValueCode(currentNode->parent->winnerKey, currentNode->parent->key);
         bufferReplaceBubbleUp(currentNode->parent, currentNode->parent->winnerIndex, binList);
     } else if (currentNode-> parent -> left -> winnerKey > currentNode -> parent -> right -> winnerKey) {
         currentNode-> parent -> index = currentNode ->parent-> left -> winnerIndex;
         currentNode-> parent -> key = currentNode -> parent -> left -> winnerKey;
         currentNode-> parent -> winnerKey = currentNode -> parent -> right -> winnerKey;
         currentNode ->parent -> winnerIndex = currentNode ->parent -> right -> winnerIndex;
+        currentNode ->parent -> offsetValueCode = computeOffSetValueCode(currentNode->parent->winnerKey, currentNode->parent->key);
         bufferReplaceBubbleUp(currentNode->parent, currentNode->parent->winnerIndex, binList);
     } else{
         if (binList[currentNode-> parent -> left -> winnerIndex].front().get_value() < binList[currentNode-> parent -> right -> winnerIndex].front().get_value()){
@@ -335,12 +361,14 @@ void NTournamentTree::bufferReplaceBubbleUp (NTournamentTreeNode * currentNode, 
             currentNode-> parent -> winnerKey = currentNode -> parent -> left -> winnerKey;
             currentNode-> parent -> key = currentNode -> parent -> right -> winnerKey;
             currentNode ->parent -> index = currentNode ->parent -> right -> winnerIndex;
+            currentNode ->parent -> offsetValueCode = computeOffSetValueCode(currentNode->parent->winnerKey, currentNode->parent->key);
             bufferReplaceBubbleUp(currentNode->parent, currentNode->parent->winnerIndex, binList);
         }else {//if (binList[currentNode-> parent -> left -> winnerIndex] > binList[currentNode-> parent -> right -> winnerIndex]) {
             currentNode-> parent -> index = currentNode ->parent-> left -> winnerIndex;
             currentNode-> parent -> key = currentNode -> parent -> left -> winnerKey;
             currentNode-> parent -> winnerKey = currentNode -> parent -> right -> winnerKey;
             currentNode ->parent -> winnerIndex = currentNode ->parent -> right -> winnerIndex;
+            currentNode ->parent -> offsetValueCode = computeOffSetValueCode(currentNode->parent->winnerKey, currentNode->parent->key);
             bufferReplaceBubbleUp(currentNode->parent, currentNode->parent->winnerIndex, binList);
         }
     }

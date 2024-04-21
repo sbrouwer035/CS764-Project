@@ -55,9 +55,6 @@ int main (int argc, char * argv [])
 	cache.nextLevelDevice = &DRAM;
 	DRAM.nextLevelDevice = &SSD;
 	SSD.nextLevelDevice = &HDD;
-
-	//std::cout << cache.numberofBin<< "\n";
-	//Ncache cache(CACHE_SIZE);
 	runExternalSort(cache);
 
 	#pragma endregion ExternalSort
@@ -139,47 +136,18 @@ void runExternalSort(NDevice& cache){
 		return;
     }
 
-
     std::string currentVal;
     
-	//test
-	//std::queue <NRecord> testQueue;
-	//std::string key ="";
-	//end test
-	//int counter=1;
     while(std::getline(inputfile, currentVal)){
         NRecord currentRecord (currentVal.substr(0,8),currentVal,currentVal.length());
-		std::cout<< "this is my new record" << currentRecord.get_size() << currentRecord.get_key()<< cache.numberofBin << "\n";
-		
+		//std::cout<< "this is my new record" << currentRecord.get_size() << currentRecord.get_key()<< cache.numberofBin << "\n";
 		
 		cache.addRecord(currentRecord);
-
-		/*
-		std::cout<< "current cache available" << (int)cache.get_cache_available() << "\n";
-		counter++;
-		if (counter==20){
-			cache.end_Cache(); //todo:: testing now
-			
-		}
-		*/
-		//run fix input direct output trounament tree logic
-		//generate cache size runs
     }
 	cache.end_Device();
 	cache.nextLevelDevice->end_Device();
 	cache.nextLevelDevice->nextLevelDevice->end_Device();
-	
-
-	/*
-	//test
-	while(!testQueue.empty()){
-		std::cout<< testQueue.front().get_value() << "\n";
-		testQueue.pop();
-	}
-	//DRAM do graceful degradation
-	//SSD
-	*/
-    traceprintf ("Reaching end of the input_table. All entries are sorted!!!!!! \n");
+    traceprintf ("Reaching end of the input_table. All entries are sorted! \n");
     inputfile.close();
 }
 

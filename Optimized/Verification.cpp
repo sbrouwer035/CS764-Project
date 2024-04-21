@@ -67,6 +67,7 @@ bool verifyDataIntegrity(){
     currentVal="";
     while(std::getline(inputfile,currentVal)){
         if (outputSet.find(currentVal) == outputSet.end()){
+            std::cout << currentVal<< "\n";
             std::cout << "Validation error: not all inputs can be found in the output file. \n";
             return false;
         }
