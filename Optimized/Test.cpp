@@ -51,10 +51,12 @@ int main (int argc, char * argv [])
 	NDevice cache (CACHE_SIZE,"CACHE");
 	NDevice DRAM (DRAM_SIZE,"DRAM");
 	NDevice SSD (SSD_SIZE,"SSD");
-	NDevice HDD (SSD_SIZE,"HDD");
+	NDevice HDDtemp(HDD_SIZE,"HDDtemp");
+	NDevice HDD (HDD_SIZE,"HDD");
 	cache.nextLevelDevice = &DRAM;
 	DRAM.nextLevelDevice = &SSD;
-	SSD.nextLevelDevice = &HDD;
+	SSD.nextLevelDevice = &HDDtemp;
+	HDDtemp.nextLevelDevice = &HDD;
 	runExternalSort(cache);
 
 	#pragma endregion ExternalSort
@@ -147,6 +149,8 @@ void runExternalSort(NDevice& cache){
 	cache.end_Device();
 	cache.nextLevelDevice->end_Device();
 	cache.nextLevelDevice->nextLevelDevice->end_Device();
+	cache.nextLevelDevice->nextLevelDevice->nextLevelDevice->end_Device();
+
     traceprintf ("Reaching end of the input_table. All entries are sorted! \n");
     inputfile.close();
 }
