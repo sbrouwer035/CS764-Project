@@ -7,7 +7,7 @@
 const uint64_t CACHE_SIZE = 1 << 20;              //1MB Cache
 const uint64_t DRAM_SIZE = 100 << 20;             //100MB DRAM
 const uint64_t SSD_SIZE = ((uint64_t)10) << 30;   //10 GB SSD
-const uint64_t HDD_SIZE = ((uint64_t)130) << 30;                //imaginary HDD size 1 TB
+const uint64_t HDD_SIZE = ((uint64_t)130) << 30;  //imaginary HDD size 130GB
 
 const int SSD_Bandwidth = 210;                    //200 MB/s => 210 byte/us SSD
 const int HDD_Bandwidth = 105;                    //100 MB/s => 105 byte/us HDD
