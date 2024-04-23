@@ -25,13 +25,13 @@ MSG=no message
 
 # default target
 #
-Test.exe : Makefile $(OBJS)
-	g++ $(CPPFLAGS) -o Test.exe $(OBJS)
+ExternalSort.exe : Makefile $(OBJS)
+	g++ $(CPPFLAGS) -o ExternalSort.exe $(OBJS)
 
-trace : Test.exe Makefile
+trace : ExternalSort.exe Makefile
 	@date > trace
-	./Test.exe >> trace
-	@size -t Test.exe $(OBJS) | sort -r >> trace
+	./ExternalSort.exe >> trace
+	@size -t ExternalSort.exe $(OBJS) | sort -r >> trace
 
 $(OBJS) : Makefile defs.h
 Test.o : Iterator.h Scan.h Filter.h Sort.h
@@ -52,5 +52,5 @@ co :
 	co $(REV) -l $(HDRS) $(SRCS) $(DOCS) $(SCRS)
 
 clean :
-	@rm -f $(OBJS) Test.exe Test.exe.stackdump trace
+	@rm -f $(OBJS) ExternalSort.exe ExternalSort.exe.stackdump trace
 
