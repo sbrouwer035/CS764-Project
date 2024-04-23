@@ -26,18 +26,31 @@ int main (int argc, char * argv [])
 	TRACE (true);
 	//--------------------------Generate input file input_table, create output files output_table and trace0.txt
 	#pragma region filePrep
-	int numberOfRecords;
-	int recordSize;
+	int numberOfRecords = 0;
+	int recordSize = 0;
 
-	//record size
-	if (atoi(argv[4]) > 2000) {
-		recordSize = 2000;
-	} else{
-		recordSize = atoi(argv[4]);
+	// extract command line parameters
+	for (int i=1; i<argc; i++) {
+		std::string arg(argv[i]);
+
+		// "-c" gives the total number of records
+		if (arg == "-c") {
+			numberOfRecords = atoi(argv[i+1]);
+		}
+
+		// "-s" is the individual record size
+		if (arg == "-s") {
+			recordSize = atoi(argv[i+1]);
+			if (recordSize > 2000) {
+				recordSize = 2000;
+			}
+		}
+
+		// "-o" is the trace of your program run
+		if (arg == "-o") {
+			// do trace stuff
+		}
 	}
-
-	//# of records
-	numberOfRecords = atoi(argv[2]);
 	
 	if (!generateInput(numberOfRecords,recordSize)){
 		std::cout << "Error: having issue generating input. Please investigate. \n";
