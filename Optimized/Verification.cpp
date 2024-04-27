@@ -28,7 +28,7 @@ bool verifySortOrder(){
         }
         previousVal = currentVal;
     }
-    std::cout << "Output is sorted. Validation success. \n";
+    std::cout << "\t... Output is sorted\n";
     outputfile.close();
     return true;
 }
@@ -36,6 +36,9 @@ bool verifySortOrder(){
 
 //Make sure the outputfile has all inputfile records 
 bool verifyDataIntegrity(){
+    std::string passStr = "\t... All input keys are present in output\n";
+    std::string errorStr = "Validation error: not all input keys present in output\n";
+
     std::ifstream outputfile;
     outputfile.open("output_table", std::ios::out);
     
@@ -49,10 +52,10 @@ bool verifyDataIntegrity(){
 
     if (outputfile.peek() == std::ifstream::traits_type::eof()){
         if(inputfile.peek() == std::ifstream::traits_type::eof()){
-            std::cout << "All input rows are found in output. Validation pass. \n";
+            std::cout << passStr;
             return true;
         } else {
-            std::cout << "Validation error: not all inputs can be found in the output file. \n";
+            std::cout << errorStr;
             return false;
         }
     }
@@ -68,11 +71,11 @@ bool verifyDataIntegrity(){
     while(std::getline(inputfile,currentVal)){
         if (outputSet.find(currentVal) == outputSet.end()){
             std::cout << currentVal<< "\n";
-            std::cout << "Validation error: not all inputs can be found in the output file. \n";
+            std::cout << errorStr;
             return false;
         }
     }
-    std::cout << "All input rows are found in output. Validation pass. \n";
+    std::cout << passStr;
     outputfile.close();
     inputfile.close();
     return true;

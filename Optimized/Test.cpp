@@ -22,14 +22,9 @@ void runExternalSort(NDevice& cache);
 
 
 int main (int argc, char * argv [])
-{	
-	TRACE (true);
-	//--------------------------Generate input file input_table, create output files output_table and trace0.txt
-	#pragma region filePrep
+{	// extract command line parameters
 	int numberOfRecords = 0;
 	int recordSize = 0;
-
-	// extract command line parameters
 	for (int i=1; i<argc; i++) {
 		std::string arg(argv[i]);
 
@@ -52,15 +47,17 @@ int main (int argc, char * argv [])
 		}
 	}
 	
+	// generate records, write to input_table
+	printf("Generating %d records of size %d...\n",numberOfRecords,recordSize);
 	if (!generateInput(numberOfRecords,recordSize)){
 		std::cout << "Error: having issue generating input. Please investigate. \n";
 		return 0;
 	};
-	traceprintf("input_table generated. \n");
-    #pragma endregion filePrep
+	printf("Record generation complete!\n");
 
 	
-	#pragma region ExternalSort
+	// sort records, write to output_table
+	printf("Sorting records...\n");
 	NDevice cache (CACHE_SIZE,"CACHE");
 	NDevice DRAM (DRAM_SIZE,"DRAM");
 	NDevice SSD (SSD_SIZE,"SSD");
@@ -71,14 +68,13 @@ int main (int argc, char * argv [])
 	SSD.nextLevelDevice = &HDDtemp;
 	HDDtemp.nextLevelDevice = &HDD;
 	runExternalSort(cache);
+    printf("Sorting complete!\n");
 
-	#pragma endregion ExternalSort
-
-	//----------------------------Validation
-	#pragma region validation
+	// validate output
+	printf("Validating output...\n");
 	verifyDataIntegrity();
 	verifySortOrder();
-	#pragma endregion validation
+	printf("Validation complete!\n");
 
 	return 0;
 } // main
@@ -140,10 +136,10 @@ void runExternalSort(NDevice& cache){
 	
 	std::ifstream inputfile;
     inputfile.open("input_table", std::ios::out);
-	TRACE (true);
 	
     if (!inputfile.is_open()){
 		traceprintf ("Error: fail to open the input_table. \n");
+		return;
     }
     
     if (inputfile.peek() == std::ifstream::traits_type::eof()){
@@ -154,9 +150,7 @@ void runExternalSort(NDevice& cache){
     std::string currentVal;
     
     while(std::getline(inputfile, currentVal)){
-        NRecord currentRecord (currentVal.substr(0,8),currentVal,currentVal.length());
-		//std::cout<< "this is my new record" << currentRecord.get_size() << currentRecord.get_key()<< cache.numberofBin << "\n";
-		
+        NRecord currentRecord (currentVal.substr(0,8),currentVal,currentVal.length());		
 		cache.addRecord(currentRecord);
     }
 	cache.end_Device();
@@ -164,7 +158,6 @@ void runExternalSort(NDevice& cache){
 	cache.nextLevelDevice->nextLevelDevice->end_Device();
 	cache.nextLevelDevice->nextLevelDevice->nextLevelDevice->end_Device();
 
-    traceprintf ("Reaching end of the input_table. All entries are sorted! \n");
     inputfile.close();
 }
 

@@ -52,5 +52,5 @@ co :
 	co $(REV) -l $(HDRS) $(SRCS) $(DOCS) $(SCRS)
 
 clean :
-	@rm -f $(OBJS) ExternalSort.exe ExternalSort.exe.stackdump trace input_table output_table
+	@rm -f $(OBJS) ExternalSort.exe ExternalSort.exe.stackdump trace input_table output_table trace0.txt
 

@@ -172,35 +172,24 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     int freedspace = 0;
     std::string lastPopedKey = "";
     
-    //std::cout << "\n\n\n I was here in spillAll " <<nextLevelDevice.deviceType<<"@" << root->winnerKey << "\n";
-    //print("",root,false);
-    
-    
     while (root->winnerKey != maxKey){
         
         lastSpilledKey = root->winnerKey;
-        
-        /*
-        while (!binList[root->winnerIndex].empty() && binList[root->winnerIndex].front().get_key() < root->key){                        
-            lastPopedKey = binList[root->winnerIndex].front().get_key();
-            //TODO: add record to next layer
-            std::cout << "\n\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << "\n";
-            freedspace += binList[root->winnerIndex].front().get_size();
-            binList[root->winnerIndex].pop();
-        } */
-        lastPopedKey = binList[root->winnerIndex].front().get_key();
-            //TODO: add record to next layer
-        //std::cout << "\n\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << nextLevelDevice.deviceType<< "\n";
-        freedspace += binList[root->winnerIndex].front().get_size();
-        NRecord tempRecord (binList[root->winnerIndex].front().get_key(),binList[root->winnerIndex].front().get_value(),binList[root->winnerIndex].front().get_size());
-        nextLevelDevice.addRecord(tempRecord);
-        binList[root->winnerIndex].pop();
-        
+        NRecord winner = binList[root->winnerIndex].front();
+        lastPopedKey = winner.get_key();
+        freedspace += winner.get_size();
+        nextLevelDevice.addRecord(winner);
+        binList[root->winnerIndex].pop();        
         numberOfspilled++;
+
+        // Winner was last record in it's bin
         if (binList[root->winnerIndex].empty()){
             leafNodes[root->winnerIndex]->key = maxKey;
             leafNodes[root->winnerIndex]->winnerKey = maxKey;
-        } else {
+        }
+        
+        // Bring in next record from winner's bin
+        else {
             leafNodes[root->winnerIndex]->key = binList[root->winnerIndex].front().get_key();
             leafNodes[root->winnerIndex]->winnerKey = binList[root->winnerIndex].front().get_key();
         }
@@ -215,7 +204,8 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     if (lastSpilledKey != lastPopedKey && lastPopedKey != ""){
         lastSpilledKey = lastPopedKey;
     }
-    //std::cout << freedspace<< "freed space  \n";
+    
+    std::cout << "Spilled (all) " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
     return freedspace;
     
 }
@@ -229,43 +219,36 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
             break;
         }
         lastSpilledKey = root->winnerKey;
-        //std::cout << root->winnerKey << "new round ";
-        
-        //while (!binList[root->winnerIndex].empty() && binList[root->winnerIndex].front().get_key() < root->key){
-        spaceNeeded -= binList[root->winnerIndex].front().get_size();
-                    
-        lastPopedKey = binList[root->winnerIndex].front().get_key();
-            //TODO: add record to next layer
-        //std::cout << "\n The next poped value: "<<binList[root->winnerIndex].front().get_value() << "\n";
-        freedspace += binList[root->winnerIndex].front().get_size();
-        
-        NRecord tempRecord (binList[root->winnerIndex].front().get_key(),binList[root->winnerIndex].front().get_value(),binList[root->winnerIndex].front().get_size());
-        nextLevelDevice.addRecord(tempRecord);
-
+        NRecord recToSpill = binList[root->winnerIndex].front();
+        spaceNeeded -= recToSpill.get_size();
+        lastPopedKey = recToSpill.get_key();
+        freedspace += recToSpill.get_size();        
+        nextLevelDevice.addRecord(recToSpill);
         binList[root->winnerIndex].pop();
         numberOfspilled++;
         
-        
+        // recToSpill was last record in bin
         if (binList[root->winnerIndex].empty()){
             leafNodes[root->winnerIndex]->key = maxKey;
             leafNodes[root->winnerIndex]->winnerKey = maxKey;
-        } else {
+        }
+        
+        // Bring in next record from recToSpill's bin
+        else {
             leafNodes[root->winnerIndex]->key = binList[root->winnerIndex].front().get_key();
             leafNodes[root->winnerIndex]->winnerKey = binList[root->winnerIndex].front().get_key();
         }
 
+        // Get next winner
         int tempOffsetValueCode = computeOffSetValueCode(lastSpilledKey, leafNodes[root->winnerIndex]->winnerKey);
         bubbleUp(leafNodes[root->winnerIndex], tempOffsetValueCode, root-> winnerIndex, binList);
-        //print("", root, false);
-        //push new key through tree and get a new winner. 
-
     }
     
     if (lastSpilledKey != lastPopedKey){
         lastSpilledKey = lastPopedKey;
     }
-    //std::cout << freedspace<< "freed space \n";
-    //print("", root, false);
+    
+    std::cout << "Spilled " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
     return freedspace;
     
 }

@@ -160,12 +160,14 @@ void NDevice::cleanup_Device()
     graceful_degradation = false;
     std::queue<NRecord> tempbuffer_bin;
     std::queue<NRecord> tempside_bin;
-    // std::queue<NRecord> newside_bin;
+    int cnt=0;
     while (!side_bin.empty())
     {
         tempside_bin.push(side_bin.front());
         side_bin.pop();
+        cnt++;
     }
+    traceprintf("Cleared %d records from side bin\n",cnt);
     // clear(side_bin);
 
     binList.clear();
@@ -174,9 +176,6 @@ void NDevice::cleanup_Device()
     binList.push_back(tempside_bin);
 
     cacheTree = NULL;
-    //std::cout << "\n\n cleanup_Cache print the binList"; //<< binList[1].front().get_key() << binList[0].empty()<<"\n\n\n";
-
-    //std::cout << "\n\n cleanup_Cache print the sidebin"; //<< side_bin.front().get_value() <<"\n\n\n";
 }
 void NDevice::end_Device()
 {   
