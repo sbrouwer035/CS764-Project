@@ -1,18 +1,18 @@
 # CS764-Project
-External merge sort project for CS 764 Spring 2024
-Shawn Feng, Shawn Brouwer
+External merge sort project for CS 764 Spring 2024  
+Shawn Feng, Shawn Brouwer  
 
-Running program:
-    ./ExternalSort.exe -c <record count> -s <record size> -o <trace filename>
-    -c Record Count (required)
-    -s Record Size (required), for variable sized records pass -1
-    -s Trace Filename (optional), details on reads and writes to/from SDD and HDD will be written to this file
+## Running program
+./ExternalSort.exe -c <record count> -s <record size> -o <trace filename>  
+-c Record Count (required)  
+-s Record Size (required), for variable sized records pass -1  
+-s Trace Filename (optional), details on reads and writes to/from SDD and HDD will be written to this file  
 
-    Example 1: Sort 2000 records of size 1024b, output trace information to trace0.txt
-    ./ExternalSort.exe -c 2000 -s 1024b -o trace0.txt
+Example 1: Sort 2000 records of size 1024b, output trace information to trace0.txt    
+./ExternalSort.exe -c 2000 -s 1024b -o trace0.txt
 
-    Example 2: Sort 500 records of variable size, output trace information to trace1.txt
-    ./ExternalSort.exe -c 500 -s -1 -o trace1.txt
+Example 2: Sort 500 records of variable size, output trace information to trace1.txt  
+./ExternalSort.exe -c 500 -s -1 -o trace1.txt  
 
 Overview:
 The first step of the sort is to generate random alphanumeric values of the given size. The generated input data is written to the "input_table". In general, the data is read from the "input_table", sorted, and then written to the "output_table". While reading in the data, it is sorted into runs or bins which are implemented using FIFO queues (in the code, all run-related variables have “bin” in the name). Queues entries are added in ascending order. Variable-sized bins were used to maximize bin utilization and reduce bin numbers. This strategy is implemented at every storage level. When the storage level is full, a tournament tree is created to spill records in sorted order to the next storage level. This process is repeated until all records have been read in and sorted. The sorted output is written to the "output_table".
