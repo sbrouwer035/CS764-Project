@@ -5,10 +5,7 @@
 #include <cstdlib>
 #include <queue>
 #include "Constant.h"
-#include "Iterator.h"
-#include "Scan.h"
-#include "Filter.h"
-#include "Sort.h"
+#include "defs.h"
 #include "verification.h"
 #include "NRecord.h"
 #include "NTournamentTree.h"
@@ -18,13 +15,14 @@
 
 
 bool generateInput(int numberOfRecords, int recordSize);
-void runExternalSort(NDevice& cache);
+void runExternalSort(NDevice& cache, NDevice& outputDevice);
 
 
 int main (int argc, char * argv [])
 {	// extract command line parameters
 	int numberOfRecords = 0;
 	int recordSize = 0;
+	char* traceFile = NULL;
 	for (int i=1; i<argc; i++) {
 		std::string arg(argv[i]);
 
@@ -43,7 +41,15 @@ int main (int argc, char * argv [])
 
 		// "-o" is the trace of your program run
 		if (arg == "-o") {
-			// do trace stuff
+			traceFile = argv[i+1];
+			remove(traceFile);
+			std::fstream traceFileStream;
+			traceFileStream.open(traceFile, std::ios::out);
+			if (!traceFileStream.is_open()){
+        		std::cout<<"Error: failed to open the trace file: " << traceFile << "\n";
+        		return false;
+    		}
+			traceFileStream.close();
 		}
 	}
 	
@@ -58,16 +64,15 @@ int main (int argc, char * argv [])
 	
 	// sort records, write to output_table
 	printf("Sorting records...\n");
-	NDevice cache (CACHE_SIZE,"CACHE");
-	NDevice DRAM (DRAM_SIZE,"DRAM");
-	NDevice SSD (SSD_SIZE,"SSD");
-	NDevice HDDtemp(HDD_SIZE,"HDDtemp");
-	NDevice HDD (HDD_SIZE,"HDD");
+	NDevice cache (CACHE_SIZE, "CACHE", traceFile);
+	NDevice DRAM (DRAM_SIZE, "DRAM", traceFile);
+	NDevice SSD (SSD_SIZE, "SSD", traceFile);
+	NDevice HDD (HDD_SIZE, "HDD", traceFile);	
+	NDevice outputDevice(HDD_SIZE, "output_table", traceFile);
 	cache.nextLevelDevice = &DRAM;
 	DRAM.nextLevelDevice = &SSD;
-	SSD.nextLevelDevice = &HDDtemp;
-	HDDtemp.nextLevelDevice = &HDD;
-	runExternalSort(cache);
+	SSD.nextLevelDevice = &HDD;
+	runExternalSort(cache, outputDevice);
     printf("Sorting complete!\n");
 
 	// validate output
@@ -80,16 +85,13 @@ int main (int argc, char * argv [])
 } // main
 
 bool generateInput(int numberOfRecords, int recordSize){
+	
+	remove("input_table");
+	remove("output_table");
+	
 	std::fstream createdOutputFile;
 	createdOutputFile.open("output_table", std::ios::out|std::ios::binary);
 	if (!createdOutputFile.is_open()){
-        std::cout<<"Error: fail to open the file. \n";
-        return false;
-    }
-
-	std::fstream createdOutputTraceFile;
-	createdOutputTraceFile.open("trace0.txt", std::ios::out|std::ios::binary);
-	if (!createdOutputTraceFile.is_open()){
         std::cout<<"Error: fail to open the file. \n";
         return false;
     }
@@ -128,11 +130,10 @@ bool generateInput(int numberOfRecords, int recordSize){
 	}
     generatedInput.close();	
 	createdOutputFile.close();
-	createdOutputTraceFile.close();
 	return true;
 }
 
-void runExternalSort(NDevice& cache){
+void runExternalSort(NDevice& cache, NDevice& outputDevice){
 	
 	std::ifstream inputfile;
     inputfile.open("input_table", std::ios::out);
@@ -153,10 +154,10 @@ void runExternalSort(NDevice& cache){
         NRecord currentRecord (currentVal.substr(0,8),currentVal,currentVal.length());		
 		cache.addRecord(currentRecord);
     }
-	cache.end_Device();
-	cache.nextLevelDevice->end_Device();
-	cache.nextLevelDevice->nextLevelDevice->end_Device();
-	cache.nextLevelDevice->nextLevelDevice->nextLevelDevice->end_Device();
+	cache.end_Device(outputDevice);
+	cache.nextLevelDevice->end_Device(outputDevice);									//DRAM
+	cache.nextLevelDevice->nextLevelDevice->end_Device(outputDevice);					//SSD
+	cache.nextLevelDevice->nextLevelDevice->nextLevelDevice->end_Device(outputDevice);  //HDD
 
     inputfile.close();
 }

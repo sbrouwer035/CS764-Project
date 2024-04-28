@@ -9,6 +9,7 @@
 #include <queue>
 #include <math.h>
 #include <limits>
+#include <fstream>
 
 class NDevice
 {
@@ -26,9 +27,10 @@ public:
     std::queue<NRecord> side_bin; //Host new entries that can't fit into the Tree. Only one additional bin is allowed.
     NDevice *nextLevelDevice;
     NTournamentTree *cacheTree;   //pointer to the current tree
+    char* traceFile;
     
 
-    NDevice(uint64_t memorySize, std::string type);
+    NDevice(uint64_t memorySize, std::string type, char* traceFN);
     
     //getter
     uint64_t get_memory_available(){
@@ -66,7 +68,7 @@ public:
     void writeToFile(NRecord record);
     void addRecord(NRecord record);
     void cleanup_Device ();
-    void end_Device();
+    void end_Device(NDevice& outputDevice);
 
 };
 

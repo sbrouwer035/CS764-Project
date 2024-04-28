@@ -5,6 +5,7 @@
 #include "NDevice.h"
 #include <cmath>
 #include <math.h>
+#include <fstream>
 
 NTournamentTree::NTournamentTree (int binNumbers, std::string type){
     root = new NTournamentTreeNode ("",0);
@@ -82,11 +83,6 @@ void NTournamentTree::fillTree(std::vector< std::queue<NRecord> >& binList, int 
             leafNodes[i] -> winnerIndex = i;
         }            
     }
-    /*std::cout << "I am in fillTree: check leafnode key" << leafNodes[0]-> key<<"\n";
-    if (!binList[0].empty()){
-        std::cout << binList[0].front().get_key();
-    }
-    */
     mergeTree (root, binList);
 }
 
@@ -205,7 +201,15 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
         lastSpilledKey = lastPopedKey;
     }
     
-    std::cout << "Spilled (all) " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
+    if (nextLevelDevice.traceFile != NULL){
+        std::fstream traceFileStream;
+        traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
+        if (!traceFileStream.is_open()){
+            traceprintf("Error opening traceFile\n");
+        }
+        traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
+        traceFileStream.close();
+    }
     return freedspace;
     
 }
@@ -248,9 +252,16 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
         lastSpilledKey = lastPopedKey;
     }
     
-    std::cout << "Spilled " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
-    return freedspace;
-    
+    if (nextLevelDevice.traceFile != NULL){
+        std::fstream traceFileStream;
+        traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
+        if (!traceFileStream.is_open()){
+            traceprintf("Error opening traceFile\n");
+        }
+        traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
+        traceFileStream.close();
+    }
+    return freedspace;  
 }
 
 void NTournamentTree::pushBufferBinFirstRecord(std::vector< std::queue<NRecord> >& binList){
