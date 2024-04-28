@@ -64,11 +64,11 @@ int main (int argc, char * argv [])
 	
 	// sort records, write to output_table
 	printf("Sorting records...\n");
-	NDevice cache (CACHE_SIZE, "CACHE", traceFile);
-	NDevice DRAM (DRAM_SIZE, "DRAM", traceFile);
-	NDevice SSD (SSD_SIZE, "SSD", traceFile);
-	NDevice HDD (HDD_SIZE, "HDD", traceFile);	
-	NDevice outputDevice(HDD_SIZE, "output_table", traceFile);
+	NDevice cache (CACHE_SIZE, "CACHE", traceFile, 0, 0);
+	NDevice DRAM (DRAM_SIZE, "DRAM", traceFile, 0, 0);
+	NDevice SSD (SSD_SIZE, "SSD", traceFile, SSD_LATENCY, SSD_Bandwidth);
+	NDevice HDD (HDD_SIZE, "HDD", traceFile, HDD_LATENCY, HDD_Bandwidth);	
+	NDevice outputDevice(HDD_SIZE, "output_table", traceFile, 0, 0);
 	cache.nextLevelDevice = &DRAM;
 	DRAM.nextLevelDevice = &SSD;
 	SSD.nextLevelDevice = &HDD;

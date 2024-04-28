@@ -28,9 +28,11 @@ public:
     NDevice *nextLevelDevice;
     NTournamentTree *cacheTree;   //pointer to the current tree
     char* traceFile;
+    double latency;
+    double bandwidth;
     
 
-    NDevice(uint64_t memorySize, std::string type, char* traceFN);
+    NDevice(uint64_t memorySize, std::string type, char* traceFN, double lat, double bw);
     
     //getter
     uint64_t get_memory_available(){
@@ -69,6 +71,7 @@ public:
     void addRecord(NRecord record);
     void cleanup_Device ();
     void end_Device(NDevice& outputDevice);
+    std::string latencyString(uint64_t dataSize);
 
 };
 

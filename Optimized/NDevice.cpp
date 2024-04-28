@@ -3,8 +3,9 @@
 #include "NRecord.h"
 #include <vector>
 #include <fstream>
+#include <sstream>
 
-NDevice::NDevice(uint64_t memorySize, std::string type, char* traceFN)
+NDevice::NDevice(uint64_t memorySize, std::string type, char* traceFN, double lat, double bw)
 {   
     this -> memory_available = memorySize;
     this -> numberOfRecord = 0;
@@ -15,6 +16,8 @@ NDevice::NDevice(uint64_t memorySize, std::string type, char* traceFN)
     this -> binList.push_back(buffer_bin); 
     this -> cacheTree = NULL;
     this -> traceFile = traceFN;
+    this -> latency = lat;
+    this -> bandwidth = bw;
 }
 
 void NDevice::writeToFile(NRecord record){
@@ -49,7 +52,7 @@ void NDevice::addRecord(NRecord record)
         // Evict records from our merge tree
         if (get_GD())
         {
-            int spaceReleased = cacheTree->spilltoFreeSpace(record.get_size(), binList, *nextLevelDevice);
+            int spaceReleased = cacheTree->spilltoFreeSpace(record.get_size(), binList, *this, *nextLevelDevice);
             set_memory_available(get_memory_available() + (unsigned)(spaceReleased));
 
             // can't release more space from existing tree, flush device and start fresh
@@ -69,7 +72,7 @@ void NDevice::addRecord(NRecord record)
             cacheTree->buildTree(counter, cacheTree->numberOfBins);
             cacheTree->fillTree(binList, get_numberOfBin());
 
-            int spaceReleased = cacheTree->spilltoFreeSpace(record.get_size(), binList, *nextLevelDevice);
+            int spaceReleased = cacheTree->spilltoFreeSpace(record.get_size(), binList, *this, *nextLevelDevice);
             set_memory_available(get_memory_available() + (unsigned)(spaceReleased));
 
             set_GD(true);
@@ -152,7 +155,7 @@ void NDevice::cleanup_Device()
         return;
     }
     
-    set_memory_available(get_memory_available() + cacheTree->spillAll(binList, *nextLevelDevice));
+    set_memory_available(get_memory_available() + cacheTree->spillAll(binList, *this, *nextLevelDevice));
 
     numberOfRecord -= cacheTree->numberOfspilled;
 
@@ -193,11 +196,21 @@ void NDevice::end_Device(NDevice& outputDevice)
     
     // No records at the next level -> write the output
     if (nextLevelDevice == NULL || nextLevelDevice->numberOfRecord == 0) {
-        cacheTree->spillAll(binList, outputDevice);
+        cacheTree->spillAll(binList, *this, outputDevice);
         return;
     }
     
     // Merge remaining records into next device
     cleanup_Device();
+}
+
+std::string NDevice::latencyString(uint64_t dataSize){
+    if (deviceType != "HDD" && deviceType != "SSD"){
+        return "";
+    }
+    int time = (2*latency) + (dataSize/bandwidth);
+    std::stringstream str;
+    str << " with latency " << time << "us";
+    return str.str();
 }
 

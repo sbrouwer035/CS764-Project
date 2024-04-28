@@ -164,8 +164,9 @@ int NTournamentTree::computeOffSetValueCode (std::string smallerKey, std::string
         return offsetValueCode;
 }
 
-uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList, NDevice& nextLevelDevice) {
+uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList, NDevice& thisDevice, NDevice& nextLevelDevice) {
     int freedspace = 0;
+    int readSize = 0;
     std::string lastPopedKey = "";
     
     while (root->winnerKey != maxKey){
@@ -186,8 +187,10 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
         
         // Bring in next record from winner's bin
         else {
-            leafNodes[root->winnerIndex]->key = binList[root->winnerIndex].front().get_key();
-            leafNodes[root->winnerIndex]->winnerKey = binList[root->winnerIndex].front().get_key();
+            NRecord nextRec = binList[root->winnerIndex].front();
+            leafNodes[root->winnerIndex]->key = nextRec.get_key();
+            leafNodes[root->winnerIndex]->winnerKey = nextRec.get_key();
+            readSize += nextRec.get_size();
         }
 
         int tempOffsetValueCode = computeOffSetValueCode(lastSpilledKey, leafNodes[root->winnerIndex]->winnerKey);
@@ -200,22 +203,29 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     if (lastSpilledKey != lastPopedKey && lastPopedKey != ""){
         lastSpilledKey = lastPopedKey;
     }
-    
-    if (nextLevelDevice.traceFile != NULL){
-        std::fstream traceFileStream;
-        traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
-        if (!traceFileStream.is_open()){
-            traceprintf("Error opening traceFile\n");
-        }
-        traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
-        traceFileStream.close();
+
+    // Latency only matters for SSD and HDD I/O
+    if (nextLevelDevice.traceFile == NULL || thisDevice.deviceType == "CACHE"){
+        return freedspace;
     }
-    return freedspace;
-    
+      
+    std::fstream traceFileStream;
+    traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
+    if (!traceFileStream.is_open()){
+        traceprintf("Error opening traceFile\n");
+        return freedspace;
+    }
+    if (readSize > 0 && thisDevice.deviceType != "DRAM") {
+        traceFileStream << "Read " << readSize << " from " << thisDevice.deviceType << thisDevice.latencyString(readSize) << "\n";
+    }    
+    traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << nextLevelDevice.latencyString(freedspace) << "\n";
+    traceFileStream.close();
+    return freedspace;  
 }
 
-int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue<NRecord> >& binList, NDevice &nextLevelDevice) {
+int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue<NRecord> >& binList, NDevice& thisDevice, NDevice& nextLevelDevice) {
     int freedspace = 0;
+    int readSize = 0;
     int spaceNeeded = inRecordSize;
     std::string lastPopedKey = "";
     while (spaceNeeded > 0){
@@ -239,8 +249,10 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
         
         // Bring in next record from recToSpill's bin
         else {
-            leafNodes[root->winnerIndex]->key = binList[root->winnerIndex].front().get_key();
-            leafNodes[root->winnerIndex]->winnerKey = binList[root->winnerIndex].front().get_key();
+            NRecord nextRec = binList[root->winnerIndex].front();
+            leafNodes[root->winnerIndex]->key = nextRec.get_key();
+            leafNodes[root->winnerIndex]->winnerKey = nextRec.get_key();
+            readSize += nextRec.get_size();
         }
 
         // Get next winner
@@ -252,15 +264,22 @@ int NTournamentTree::spilltoFreeSpace (int inRecordSize, std::vector< std::queue
         lastSpilledKey = lastPopedKey;
     }
     
-    if (nextLevelDevice.traceFile != NULL){
-        std::fstream traceFileStream;
-        traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
-        if (!traceFileStream.is_open()){
-            traceprintf("Error opening traceFile\n");
-        }
-        traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << "\n";
-        traceFileStream.close();
+    // Latency only matters for SSD and HDD I/O
+    if (nextLevelDevice.traceFile == NULL || thisDevice.deviceType == "CACHE"){
+        return freedspace;
     }
+      
+    std::fstream traceFileStream;
+    traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
+    if (!traceFileStream.is_open()){
+        traceprintf("Error opening traceFile\n");
+        return freedspace;
+    }
+    if (readSize > 0 && thisDevice.deviceType != "DRAM") {
+        traceFileStream << "Read " << readSize << " from " << thisDevice.deviceType << thisDevice.latencyString(readSize) << "\n";
+    }    
+    traceFileStream << "Wrote " << freedspace << " to " << nextLevelDevice.deviceType << nextLevelDevice.latencyString(freedspace) << "\n";
+    traceFileStream.close();
     return freedspace;  
 }
 
