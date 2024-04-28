@@ -54,7 +54,12 @@ int main (int argc, char * argv [])
 	}
 	
 	// generate records, write to input_table
-	printf("Generating %d records of size %d...\n",numberOfRecords,recordSize);
+	if (recordSize < 0) {
+		printf("Generating %d records of variable size...\n",numberOfRecords);
+	}
+	else {
+		printf("Generating %d records of size %d...\n",numberOfRecords,recordSize);
+	}
 	if (!generateInput(numberOfRecords,recordSize)){
 		std::cout << "Error: having issue generating input. Please investigate. \n";
 		return 0;
@@ -144,7 +149,7 @@ void runExternalSort(NDevice& cache, NDevice& outputDevice){
     }
     
     if (inputfile.peek() == std::ifstream::traits_type::eof()){
-        traceprintf ("input_table has zero entries: default sorted. \n");
+        std::cout << "\t... input_table has zero entries: default sorted. \n";
 		return;
     }
 
