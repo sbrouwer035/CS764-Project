@@ -205,12 +205,12 @@ uint64_t NTournamentTree::spillAll (std::vector< std::queue<NRecord> >& binList,
     }
 
     // Latency only matters for SSD and HDD I/O
-    if (nextLevelDevice.traceFile == NULL || thisDevice.deviceType == "CACHE"){
+    if (thisDevice.traceFile == NULL || thisDevice.deviceType == "CACHE"){
         return freedspace;
     }
       
     std::fstream traceFileStream;
-    traceFileStream.open(nextLevelDevice.traceFile, std::ios::app);
+    traceFileStream.open(thisDevice.traceFile, std::ios::app);
     if (!traceFileStream.is_open()){
         traceprintf("Error opening traceFile\n");
         return freedspace;

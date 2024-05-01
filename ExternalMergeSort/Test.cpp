@@ -77,6 +77,7 @@ int main (int argc, char * argv [])
 	cache.nextLevelDevice = &DRAM;
 	DRAM.nextLevelDevice = &SSD;
 	SSD.nextLevelDevice = &HDD;
+	HDD.nextLevelDevice = &outputDevice;
 	runExternalSort(cache, outputDevice);
     printf("Sorting complete!\n");
 
