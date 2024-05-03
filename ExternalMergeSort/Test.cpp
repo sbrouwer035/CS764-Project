@@ -6,7 +6,7 @@
 #include <queue>
 #include "Constant.h"
 #include "defs.h"
-#include "verification.h"
+#include "Verification.h"
 #include "NRecord.h"
 #include "NTournamentTree.h"
 #include "NTournamentTreeNode.h"
